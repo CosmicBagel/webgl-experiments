@@ -1,45 +1,46 @@
-﻿<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
-<script id="shader-fs" type="x-shader/x-fragment">
-	precision mediump float;
+	<title>webgl something something...</title>
+	<script id="shader-fs" type="x-shader/x-fragment">
+		precision mediump float;
 
-	void main(void) {
-		gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);
-	}
-</script>
+		void main(void) {
+			gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);
+		}
+	</script>
+	<script id="shader-vs" type="x-shader/x-vertex">
+		attribute vec3 aVertexPosition;
 
-<script id="shader-vs" type="x-shader/x-vertex">
-	attribute vec3 aVertexPosition;
+		uniform mat4 uMVMatrix;
+		uniform mat4 uPMatrix;
 
-	uniform mat4 uMVMatrix;
-	uniform mat4 uPMatrix;
-
-	void main(void) {
-		gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);
-	}
-</script>
-<script type="text/javascript" src="gl.js"></script>
-<style type="text/css">
-	#gl {
-		width: 486px;
-		height: 486px;
-		margin: 32px auto 0;
-		padding: 0;
-		background-color: #FF7340;
-		display: table;
-		padding: 8px;
-	}
-	
-	#gl p {
-		font-family: Garamond, serif;
-		text-align: center;
-		font-size: 26px;
-		display: table-cell;
-		vertical-align: middle;
-	}
-</style>	
+		void main(void) {
+			gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);
+		}
+	</script>
+	<style type="text/css">
+		#gl {
+			width: 486px;
+			height: 486px;
+			margin: 32px auto 0;
+			padding: 0;
+			background-color: #FF7340;
+			display: table;
+			padding: 8px;
+		}
+		
+		#gl p {
+			font-family: Garamond, serif;
+			text-align: center;
+			font-size: 26px;
+			display: table-cell;
+			vertical-align: middle;
+		}
+	</style>	
 </head>
-<body onload="webGlStart();">
-		<div id="gl"><p>WebGL not initalized, or your browser does not support it.</p></div>
+<body>
+	<canvas id="gl"><p>WebGL not initalized, or your browser does not support it.</p></canvas>
 </body>
+<script type="text/javascript" src="gl.js"></script>
 </html>
