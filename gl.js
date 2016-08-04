@@ -1,3 +1,4 @@
+/* globals mat4 */
 (function () {
 	"use strict";
 
@@ -70,16 +71,16 @@
 		
 		shaderProgram.pMatrixUniform = gl.getUniformLocation(shaderProgram,
 			"uPMatrix");
-		shaderProgram.mvMatrixUniform = gl.getUnifromLocation(shaderProgram,
+		shaderProgram.mvMatrixUniform = gl.getUniformLocation(shaderProgram,
 			"uvMatrix");
 	}
 
-	var mvMatrix = vec3.create();
-	var pMatrix = vec3.create();
+	var mvMatrix = mat4.create();
+	var pMatrix = mat4.create();
 
 	function setMatrixUniforms() {
 		gl.uniformMatrix4fv(shaderProgram.pMatrixUniform, false, pMatrix);
-		gl.unifromMatrix4fv(shaderProgram.mvMatrixUniform, false, mvMatrix);
+		gl.uniformMatrix4fv(shaderProgram.mvMatrixUniform, false, mvMatrix);
 	}
 
 	var triangleVertexPositionBuffer;
@@ -114,19 +115,19 @@
 		gl.viewport(-8, -8, gl.viewportWidth, gl.viewportHeight);
 		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 				
-		mat4.perspective(45, gl.viewportWidth / gl.viewportHeight, 0.1, 100.0, pMatrix);
+		mat4.perspective(pMatrix, 45, gl.viewportWidth / gl.viewportHeight, 0.1, 100.0);
 		mat4.identity(mvMatrix);
-		mat4.translate(mvMatrix, [-1.5, 0.0, -7.0]);
+		mat4.translate(mvMatrix, mvMatrix, [-1.5, 0.0, -7.0]);
 		gl.bindBuffer(gl.ARRAY_BUFFER, triangleVertexPositionBuffer);
-		gl.vertexAttrivPointer(shaderProgram.vertextPositoinAttribute,
+		gl.vertexAttribPointer(shaderProgram.vertextPositoinAttribute,
 			triangleVertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
 		setMatrixUniforms();
 		gl.drawArrays(gl.TRIANGLES, 0, triangleVertexPositionBuffer.numItems);
 		
-		mat4.translate(mvMatrix, [3.0, 0.0, 0.0]);
+		mat4.translate(mvMatrix, mvMatrix, [3.0, 0.0, 0.0]);
 		gl.bindBuffer(gl.ARRAY_BUFFER, squareVertexPositionBuffer);
-		gl.vertextAttribPointer(shaderProgram.vertexPositionAttribute,
-			squareVertexBuffer.itemSize, gl.FLOAT, false, 0, 0);
+		gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute,
+			squareVertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
 		setMatrixUniforms();
 		gl.drawArrays(gl.TRIANGLE_STRIP, 0, squareVertexPositionBuffer.numItems);
 		

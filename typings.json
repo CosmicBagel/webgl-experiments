@@ -1,5 +1,6 @@
 {
   "globalDependencies": {
+    "gl-matrix": "registry:dt/gl-matrix#2.2.2+20160701060731",
     "webgl-ext": "registry:dt/webgl-ext#0.0.0+20160316155526"
   }
 }
