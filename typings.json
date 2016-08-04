@@ -1,0 +1,5 @@
+{
+  "globalDependencies": {
+    "webgl-ext": "registry:dt/webgl-ext#0.0.0+20160316155526"
+  }
+}
