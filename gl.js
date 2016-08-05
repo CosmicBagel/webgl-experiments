@@ -4,10 +4,11 @@
 	"use strict";
 
 	var gl;
+	//initalizes gl object as webgl context
 	function initGl(canvas) {
 		try {
-			gl = canvas.getContext("webgl", 
-				{antialias: false });
+			gl = canvas.getContext("webgl", {antialias: false }) || 
+				 canvas.getContext("experimental-webgl", {antialias: false});
 			gl.viewportWidth = canvas.width + 8;
 			gl.viewportHeight = canvas.height + 8;
 		} catch (e) {
@@ -21,11 +22,11 @@
 			return null;
 		}
 		
-		var str = "";
+		var shaderSrc = "";
 		var k = shaderScript.firstChild;
 		while (k) {
 			if (k.nodeType === 3) {
-				str += k.textContent;
+				shaderSrc += k.textContent;
 			}
 			k = k.nextSibiling;
 		}
@@ -39,7 +40,7 @@
 			return null; 
 		}
 		
-		gl.shaderSource(shader, str);
+		gl.shaderSource(shader, shaderSrc);
 		gl.compileShader(shader);
 		
 		if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
@@ -75,30 +76,80 @@
 		shaderProgram.mvMatrixUniform = gl.getUniformLocation(shaderProgram,
 			"uvMatrix");
 	}
-
+	
+	//gl-matrix.js mat4
+	//http://glmatrix.net/docs/mat4.html
+	//a 4x4 matrix
 	var mvMatrix = mat4.create();
 	var pMatrix = mat4.create();
 
 	function setMatrixUniforms() {
+		console.log("mvMatrix: " + mvMatrix + "\npMatrix: " + pMatrix);
 		gl.uniformMatrix4fv(shaderProgram.pMatrixUniform, false, pMatrix);
 		gl.uniformMatrix4fv(shaderProgram.mvMatrixUniform, false, mvMatrix);
+		/*
+		---From the webgl specification (https://www.khronos.org/registry/webgl/specs/latest/1.0/#5.14.10)---
+		void uniform[1234][fi](WebGLUniformLocation? location, ...)
+		void uniform[1234][fi]v(WebGLUniformLocation? location, ...)
+		void uniformMatrix[234]fv(WebGLUniformLocation? location, GLboolean transpose, ...) (OpenGL ES 2.0 §2.10.4, man page)
+
+		Each of the uniform* functions above sets the specified uniform or uniforms to the values
+		provided. If the passed location is not null and was not obtained from the currently
+		used program via an earlier call to getUniformLocation, an INVALID_OPERATION error will
+		be generated. If the passed location is null, the data passed in will be silently ignored
+		and no uniform variables will be changed. 
+
+		If the array passed to any of the vector forms (those ending in v) has an invalid length,
+		an INVALID_VALUE error will be generated. The length is invalid if it is too short for or
+		is not an integer multiple of the assigned type.
+		*/
 	}
 
 	var triangleVertexPositionBuffer;
-	var squareVertexPositionBuffer;
+//	var squareVertexPositionBuffer;
 
 	function initBuffers() {
+		//WebGLBuffer? createBuffer() (OpenGL ES 2.0 §2.9, similar to glGenBuffers)
+
+		//Create a WebGLBuffer object and initialize it with a buffer object name as if by
+		//calling glGenBuffers.
 		triangleVertexPositionBuffer = gl.createBuffer();
+		/*
+		void bindBuffer(GLenum target, WebGLBuffer? buffer) (OpenGL ES 2.0 §2.9, man page)
+		
+		Binds the given WebGLBuffer object to the given binding point (target), either
+		ARRAY_BUFFER or ELEMENT_ARRAY_BUFFER. If the buffer is null then any buffer
+		currently bound to this target is unbound. A given WebGLBuffer object may only be bound
+		to one of the ARRAY_BUFFER or ELEMENT_ARRAY_BUFFER target in its lifetime. An attempt
+		to bind a buffer object to the other target will generate an INVALID_OPERATION error,
+		and the current binding will remain untouched.
+		
+		target
+		A GLenum specifying the binding point (target). Possible values:
+			gl.ARRAY_BUFFER: Buffer containing vertex attributes, such as vertex coordinates,
+							 texture coordinate data, or vertex color data.
+			gl.ELEMENT_ARRAY_BUFFER: Buffer used for element indices.
+			When using a WebGL 2 context, the following values are available additionally:
+				gl.COPY_READ_BUFFER: Buffer for copying from one buffer object to another.
+				gl.COPY_WRITE_BUFFER: Buffer for copying from one buffer object to another.
+				gl.TRANSFORM_FEEDBACK_BUFFER: Buffer for transform feedback operations.
+				gl.UNIFORM_BUFFER: Buffer used for storing uniform blocks.
+				gl.PIXEL_PACK_BUFFER: Buffer used for pixel transfer operations.
+				gl.PIXEL_UNPACK_BUFFER: Buffer used for pixel transfer operations.
+		buffer
+		A WebGLBuffer to bind.
+		*/
 		gl.bindBuffer(gl.ARRAY_BUFFER, triangleVertexPositionBuffer);
 		var vertices = [
-			0.0,  1.0,  0.0,
+			0.0,  1.0,  0.0, 
 			-1.0, -1.0,  0.0,
-			1.0, -1.0,  0.0
+			1.0, -1.0,  0.0 
 		];
 		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
 		triangleVertexPositionBuffer.itemSize = 3;
 		triangleVertexPositionBuffer.numItems = 3;
 		
+		/*
 		squareVertexPositionBuffer = gl.createBuffer();
 		gl.bindBuffer(gl.ARRAY_BUFFER, squareVertexPositionBuffer);
 		vertices = [
@@ -110,31 +161,41 @@
 		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
 		squareVertexPositionBuffer.itemSize = 3;
 		squareVertexPositionBuffer.numItems = 4;
+		*/
 	}
 
 	function drawScene() {
-		gl.viewport(-8, -8, gl.viewportWidth, gl.viewportHeight);
+		//set viewport size and clear to black
+		gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
 		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-				
-		mat4.perspective(pMatrix, 45, gl.viewportWidth / gl.viewportHeight, 0.1, 100.0);
+
+		console.log("viewport width: " + gl.viewportWidth + "\nviewport height: " + gl.viewportHeight);
+		console.log("buffer height: " + gl.drawingBufferHeight + "\nbuffer width: " + gl.drawingBufferWidth);
+		//sets up scene?
+		mat4.perspective(pMatrix, 45, gl.drawingBufferHeight / gl.drawingBufferWidth, 0.1, 100.0);
 		mat4.identity(mvMatrix);
-		mat4.translate(mvMatrix, mvMatrix, [-1.5, 0.0, -7.0]);
+
+		//draws triangle
+		mat4.translate(mvMatrix, mvMatrix, [0.0, 0.0, 0.0]);
 		gl.bindBuffer(gl.ARRAY_BUFFER, triangleVertexPositionBuffer);
-		gl.vertexAttribPointer(shaderProgram.vertextPositoinAttribute,
+		//The WebGLRenderingContext.vertexAttribPointer() method of the WebGL API specifies
+		//the data formats and locations of vertex attributes in a vertex attributes array.
+		//void gl.vertexAttribPointer(index, size, type, normalized, stride, offset);
+		gl.vertexAttribPointer(shaderProgram.vertextPositionAttribute,
 			triangleVertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
 		setMatrixUniforms();
 		gl.drawArrays(gl.TRIANGLES, 0, triangleVertexPositionBuffer.numItems);
 		
-		mat4.translate(mvMatrix, mvMatrix, [3.0, 0.0, 0.0]);
+		//draws square
+		/*mat4.translate(mvMatrix, mvMatrix, [3.0, 0.0, 0.0]);
 		gl.bindBuffer(gl.ARRAY_BUFFER, squareVertexPositionBuffer);
 		gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute,
 			squareVertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
 		setMatrixUniforms();
-		gl.drawArrays(gl.TRIANGLE_STRIP, 0, squareVertexPositionBuffer.numItems);
-		
+		gl.drawArrays(gl.TRIANGLE_STRIP, 0, squareVertexPositionBuffer.numItems);*/
 	}
 
-	//called from html (onload of canvas element)
+	//start here
 	function webGlStart() {
 		var canvas = document.getElementById("gl");
 		initGl(canvas);
