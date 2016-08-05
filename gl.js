@@ -1,16 +1,18 @@
 /// <reference path="typings/index.d.ts" />
-/* globals mat4 */
-(function () {
-	"use strict";
-
+/* globals mat4, vec3*/
+/* exported webGlStart */
+//this code is taken from http://learningwebgl.com/blog/?p=28 
+//var webGlStart;
+//(function () {
+"use strict"
 	var gl;
 	//initalizes gl object as webgl context
 	function initGl(canvas) {
 		try {
 			gl = canvas.getContext("webgl", {antialias: false }) || 
 				 canvas.getContext("experimental-webgl", {antialias: false});
-			gl.viewportWidth = canvas.width + 8;
-			gl.viewportHeight = canvas.height + 8;
+			gl.viewportWidth = canvas.width;
+			gl.viewportHeight = canvas.height;
 		} catch (e) {
 			alert("Unable to initalize webgl, please update your browser and don't use IE");
 		}
@@ -25,16 +27,16 @@
 		var shaderSrc = "";
 		var k = shaderScript.firstChild;
 		while (k) {
-			if (k.nodeType === 3) {
+			if (k.nodeType == 3) {
 				shaderSrc += k.textContent;
 			}
 			k = k.nextSibiling;
 		}
 		
 		var shader;
-		if (shaderScript.type === "x-shader/x-fragment") { 
+		if (shaderScript.type == "x-shader/x-fragment") { 
 			shader = gl.createShader(gl.FRAGMENT_SHADER);
-		} else if (shaderScript.type === "x-shader/x-vertex") {
+		} else if (shaderScript.type == "x-shader/x-vertex") {
 			shader = gl.createShader(gl.VERTEX_SHADER);
 		} else {
 			return null; 
@@ -67,14 +69,14 @@
 		
 		gl.useProgram(shaderProgram);
 		
-		shaderProgram.vertextPositionAttribute = gl.getAttribLocation(
+		shaderProgram.vertexPositionAttribute = gl.getAttribLocation(
 			shaderProgram, "aVertexPosition");
 		gl.enableVertexAttribArray(shaderProgram.vertexPositonAttribute);
 		
 		shaderProgram.pMatrixUniform = gl.getUniformLocation(shaderProgram,
 			"uPMatrix");
 		shaderProgram.mvMatrixUniform = gl.getUniformLocation(shaderProgram,
-			"uvMatrix");
+			"uMVatrix");
 	}
 	
 	//gl-matrix.js mat4
@@ -84,7 +86,6 @@
 	var pMatrix = mat4.create();
 
 	function setMatrixUniforms() {
-		console.log("mvMatrix: " + mvMatrix + "\npMatrix: " + pMatrix);
 		gl.uniformMatrix4fv(shaderProgram.pMatrixUniform, false, pMatrix);
 		gl.uniformMatrix4fv(shaderProgram.mvMatrixUniform, false, mvMatrix);
 		/*
@@ -131,7 +132,7 @@
 			gl.ELEMENT_ARRAY_BUFFER: Buffer used for element indices.
 			When using a WebGL 2 context, the following values are available additionally:
 				gl.COPY_READ_BUFFER: Buffer for copying from one buffer object to another.
-				gl.COPY_WRITE_BUFFER: Buffer for copying from one buffer object to another.
+				gl.COPY_WRITE_triangleVertexPositionBufferBUFFER: Buffer for copying from one buffer object to another.
 				gl.TRANSFORM_FEEDBACK_BUFFER: Buffer for transform feedback operations.
 				gl.UNIFORM_BUFFER: Buffer used for storing uniform blocks.
 				gl.PIXEL_PACK_BUFFER: Buffer used for pixel transfer operations.
@@ -172,16 +173,18 @@
 		console.log("viewport width: " + gl.viewportWidth + "\nviewport height: " + gl.viewportHeight);
 		console.log("buffer height: " + gl.drawingBufferHeight + "\nbuffer width: " + gl.drawingBufferWidth);
 		//sets up scene?
-		mat4.perspective(pMatrix, 45, gl.drawingBufferHeight / gl.drawingBufferWidth, 0.1, 100.0);
+		mat4.perspective(pMatrix, 45.0, gl.drawingBufferWidth / gl.drawingBufferHeight, 0.1, 100.0);
 		mat4.identity(mvMatrix);
 
 		//draws triangle
-		mat4.translate(mvMatrix, mvMatrix, [0.0, 0.0, 0.0]);
+		var translation = vec3.create();
+		vec3.set(translation, 0.0, 0.0, -2.0);
+		mat4.translate(mvMatrix, mvMatrix, translation);
 		gl.bindBuffer(gl.ARRAY_BUFFER, triangleVertexPositionBuffer);
 		//The WebGLRenderingContext.vertexAttribPointer() method of the WebGL API specifies
 		//the data formats and locations of vertex attributes in a vertex attributes array.
 		//void gl.vertexAttribPointer(index, size, type, normalized, stride, offset);
-		gl.vertexAttribPointer(shaderProgram.vertextPositionAttribute,
+		gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute,
 			triangleVertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
 		setMatrixUniforms();
 		gl.drawArrays(gl.TRIANGLES, 0, triangleVertexPositionBuffer.numItems);
@@ -196,7 +199,7 @@
 	}
 
 	//start here
-	function webGlStart() {
+	function webGLStart() {
 		var canvas = document.getElementById("gl");
 		initGl(canvas);
 		initShaders();
@@ -206,6 +209,6 @@
 		gl.enable(gl.DEPTH_TEST);
 		
 		drawScene();
+		console.log(gl.getError());
 	}
-	webGlStart();
-}());
+//}());

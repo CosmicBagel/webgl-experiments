@@ -1,8 +1,8 @@
 ﻿<!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<html>
 <head>
 	<title>webgl stuff</title>
-	<script src="libs/gl-matrix.js"></script>
+	<script type="text/javascript" src="libs/gl-matrix.js"></script>
 	<script id="shader-fs" type="x-shader/x-fragment">
 		precision mediump float;
 
@@ -20,6 +20,8 @@
 			gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);
 		}
 	</script>
+	<script type="text/javascript" src="gl.js"></script>
+	<!--
 	<style type="text/css">
 		#gl {
 			width: 486px;
@@ -38,10 +40,12 @@
 			display: table-cell;
 			vertical-align: middle;
 		}
-	</style>	
+	</style>
+	-->
 </head>
-<body>
-	<canvas id="gl"><p>WebGL not initalized, or your browser does not support it.</p></canvas>
+<body onload="webGLStart();">
+	<canvas id="gl" width="500" height="500">
+		<!--<p>WebGL not initalized, or your browser does not support it.</p>-->
+	</canvas>
 </body>
-<script type="text/javascript" src="gl.js"></script>
 </html>
