@@ -1,3 +1,4 @@
+/// <reference path="typings/index.d.ts" />
 /* globals mat4 */
 (function () {
 	"use strict";
