@@ -76,7 +76,7 @@
 		shaderProgram.pMatrixUniform = gl.getUniformLocation(shaderProgram,
 			"uPMatrix");
 		shaderProgram.mvMatrixUniform = gl.getUniformLocation(shaderProgram,
-			"uMVatrix");
+			"uMVMatrix");
 	}
 	
 	//gl-matrix.js mat4
