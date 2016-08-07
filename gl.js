@@ -107,7 +107,7 @@
 	}
 
 	var triangleVertexPositionBuffer;
-//	var squareVertexPositionBuffer;
+	var squareVertexPositionBuffer;
 
 	function initBuffers() {
 		//WebGLBuffer? createBuffer() (OpenGL ES 2.0 §2.9, similar to glGenBuffers)
@@ -150,7 +150,6 @@
 		triangleVertexPositionBuffer.itemSize = 3;
 		triangleVertexPositionBuffer.numItems = 3;
 		
-		/*
 		squareVertexPositionBuffer = gl.createBuffer();
 		gl.bindBuffer(gl.ARRAY_BUFFER, squareVertexPositionBuffer);
 		vertices = [
@@ -162,7 +161,6 @@
 		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
 		squareVertexPositionBuffer.itemSize = 3;
 		squareVertexPositionBuffer.numItems = 4;
-		*/
 	}
 
 	function drawScene() {
@@ -190,12 +188,12 @@
 		gl.drawArrays(gl.TRIANGLES, 0, triangleVertexPositionBuffer.numItems);
 		
 		//draws square
-		/*mat4.translate(mvMatrix, mvMatrix, [3.0, 0.0, 0.0]);
+		mat4.translate(mvMatrix, mvMatrix, [2.0, 0.0, -2.0]);
 		gl.bindBuffer(gl.ARRAY_BUFFER, squareVertexPositionBuffer);
 		gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute,
 			squareVertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
 		setMatrixUniforms();
-		gl.drawArrays(gl.TRIANGLE_STRIP, 0, squareVertexPositionBuffer.numItems);*/
+		gl.drawArrays(gl.TRIANGLE_STRIP, 0, squareVertexPositionBuffer.numItems);
 	}
 
 	//start here
